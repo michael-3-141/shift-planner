@@ -61,7 +61,9 @@ export const he: Messages = {
     nobodyAvailable: 'אין אף אחד זמין',
     noPeopleForTimeOff: 'יש להוסיף עובדים כדי לרשום היעדרויות.',
     noPositions: 'יש להוסיף עמדות כדי לראות את הלוח.',
-    pickStart: time => `התחלה ${time}. יש להקיש היכן זה מסתיים.`,
+    pickStart: time => `מ־${time} · יש להקיש היכן זה מסתיים`,
+    goToday: 'מעבר להיום',
+    more: 'עוד',
   },
   forms: {
     enterRange: 'יש להזין התחלה וסיום.',

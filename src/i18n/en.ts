@@ -58,7 +58,9 @@ export const en = {
     nobodyAvailable: 'Nobody available',
     noPeopleForTimeOff: 'Add people to record their time off.',
     noPositions: 'Add positions to see the schedule.',
-    pickStart: (time: string) => `Start ${time}. Tap where it ends.`,
+    pickStart: (time: string) => `From ${time} · tap where it ends`,
+    goToday: 'Go to today',
+    more: 'More',
   },
   forms: {
     enterRange: 'Enter a start and an end.',

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type TouchEvent } from 'react'
-import { t } from '../i18n'
 import { isRtl } from '../i18n/locale'
 import { addDays, formatDay, formatHour, formatTime, HOUR, hoursIntoDay, MINUTE } from '../model/time'
 
@@ -39,19 +38,25 @@ interface Props {
   onSwipe?: (direction: 1 | -1) => void
   /** Receives the height available below the headers, for fitting a whole day. */
   onViewportHeight?: (px: number) => void
+  /** The start of a range being picked by tapping, or undefined; the screen shows the hint. */
+  onPicking?: (start: number | undefined) => void
+  /** Changing this cancels a range being picked. */
+  pickReset?: number
 }
 
 const gap = (b: GridBlock) => (b.kind === 'coverage' ? 0 : 1)
 
 interface Pick { scope: string; day: number; columnId: string; start: number; end: number; dragging?: boolean }
 
-export function Grid({ days, columns, blocks, stepMinutes, hourPx, now, onRange, onSwipe, onViewportHeight }: Props) {
+export function Grid({ days, columns, blocks, stepMinutes, hourPx, now, onRange, onSwipe, onViewportHeight, onPicking, pickReset = 0 }: Props) {
   const scroller = useRef<HTMLDivElement>(null)
   const axis = useRef<HTMLDivElement>(null)
-  // A pick belongs to what was on screen when it started.
-  const scope = `${days.join()}|${columns.map(c => c.id).join()}|${stepMinutes}`
+  // A pick belongs to what was on screen when it started, and ends when the screen cancels it.
+  const scope = `${days.join()}|${columns.map(c => c.id).join()}|${stepMinutes}|${pickReset}`
   const [rawPick, setPick] = useState<Pick>()
   const pick = rawPick?.scope === scope ? rawPick : undefined
+  const picking = pick && !pick.dragging ? Math.min(pick.start, pick.end) : undefined
+  useEffect(() => onPicking?.(picking), [picking, onPicking])
   const drag = useRef<{ pick: Pick; moved: boolean }>(undefined)
   const swipe = useRef<{ x: number; y: number }>(undefined)
   const step = stepMinutes * MINUTE
@@ -69,7 +74,9 @@ export function Grid({ days, columns, blocks, stepMinutes, hourPx, now, onRange,
     const el = scroller.current!
     // The hours start below the headers, wherever the grid is scrolled to.
     const headers = () => axis.current!.getBoundingClientRect().top - el.getBoundingClientRect().top + el.scrollTop
-    const observer = new ResizeObserver(() => onViewportHeight(el.clientHeight - headers()))
+    // Room left below the day (for a floating button) isn't part of the day.
+    const below = () => parseFloat(getComputedStyle(el).paddingBottom) || 0
+    const observer = new ResizeObserver(() => onViewportHeight(el.clientHeight - headers() - below()))
     observer.observe(el)
     return () => observer.disconnect()
   }, [onViewportHeight])
@@ -140,12 +147,6 @@ export function Grid({ days, columns, blocks, stepMinutes, hourPx, now, onRange,
 
   return (
     <div className="grid-wrap">
-      {pick && !pick.dragging && (
-        <div className="pick-hint" role="status">
-          <span>{t().schedule.pickStart(formatTime(Math.min(pick.start, pick.end)))}</span>
-          <button onClick={() => setPick(undefined)}>{t().common.cancel}</button>
-        </div>
-      )}
       <div className="grid-scroll" ref={scroller} onTouchStart={touchStart} onTouchEnd={touchEnd}>
         <div className={`grid${multiDay ? ' multi' : ''}`} style={style}>
           <div className="corner" />

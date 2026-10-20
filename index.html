@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <!-- Hosts that cannot send the isolation headers (GitHub Pages) get them from this service worker instead. -->
+    <script src="./coi-serviceworker.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Shift planner</title>
+    <script>
+      // Same rule as src/ui/theme.ts, run before the first paint.
+      try {
+        var saved = localStorage.getItem('theme')
+        var light = saved === 'light' || (saved !== 'dark' && matchMedia('(prefers-color-scheme: light)').matches)
+        document.documentElement.dataset.theme = light ? 'light' : 'dark'
+      } catch (e) {}
+      // Same rule as src/i18n/locale.ts: Hebrew mirrors the page.
+      try {
+        var language = localStorage.getItem('language') || (/^(he|iw)\b/i.test(navigator.language) ? 'he' : 'en')
+        document.documentElement.lang = language
+        document.documentElement.dir = language === 'he' ? 'rtl' : 'ltr'
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

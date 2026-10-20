@@ -1,0 +1,108 @@
+/*
+ * Theme tokens. Surfaces get lighter as they rise in the dark theme (page, raised bars and cards, controls)
+ * and stay white in the light one. Text (--fg, --muted) meets WCAG AA, 4.5:1 or better, on every surface
+ * in both; --faint is for edges, not text. The theme is set on <html data-theme> (see theme.ts).
+ */
+:root {
+  --bg: #1f232b;
+  --raised: #272c36;
+  --surface: #313743;
+  --surface-2: #3c4352;
+  --field: #22262e;
+  --line: #4c5466;
+  --line-soft: #383f4c;
+  --line-strong: #616a7e;
+  --slot-line: rgb(255 255 255 / 0.04);
+  --fg: #f4f6fa;
+  --muted: #bec5d1;
+  --faint: #9aa2b2;
+  --accent: #93a3ff;
+  --accent-hover: #a9b6ff;
+  --accent-2: #bb95ff;
+  --accent-fg: #11131a;
+  --accent-soft: rgb(147 163 255 / 0.18);
+  --danger: #ff7a8c;
+  --danger-soft: rgb(255 122 140 / 0.15);
+  --need: rgb(147 163 255 / 0.11);
+  --off: #434957;
+  --past: rgb(0 0 0 / 0.2);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35);
+  --shadow-lg: 0 16px 48px rgb(0 0 0 / 0.5);
+  --backdrop: rgb(6 8 12 / 0.55);
+  color-scheme: dark;
+
+  /* Controls are compact with a mouse and stay thumb-sized on touch screens. */
+  --control: 34px;
+  --radius: 8px;
+
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Hebrew', sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme='light'] {
+  --bg: #eef0f4;
+  --raised: #ffffff;
+  --surface: #f6f7f9;
+  --surface-2: #e8ebf0;
+  --field: #ffffff;
+  --line: #d3d8e0;
+  --line-soft: #e5e8ed;
+  --line-strong: #b4bbc8;
+  --slot-line: rgb(20 24 32 / 0.035);
+  --fg: #161a22;
+  --muted: #525a69;
+  --faint: #8a92a1;
+  --accent: #4b5bdc;
+  --accent-hover: #3d4cc8;
+  --accent-2: #8656ea;
+  --accent-fg: #ffffff;
+  --accent-soft: rgb(75 91 220 / 0.12);
+  --danger: #cc2d47;
+  --danger-soft: rgb(204 45 71 / 0.1);
+  --need: rgb(75 91 220 / 0.08);
+  --off: #dde0e6;
+  --past: rgb(20 24 32 / 0.05);
+  --shadow-sm: 0 1px 2px rgb(20 24 32 / 0.12);
+  --shadow-lg: 0 16px 48px rgb(20 24 32 / 0.18);
+  --backdrop: rgb(20 24 32 / 0.35);
+  color-scheme: light;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --control: 44px;
+    font-size: 15px;
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+h1, h2, p {
+  margin: 0;
+}
+
+button, input, select {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent-soft);
+}

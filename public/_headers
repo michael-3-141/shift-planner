@@ -1,0 +1,4 @@
+# Cloudflare Pages and Netlify: CP-SAT runs multithreaded WebAssembly, which needs a cross-origin isolated page.
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp

@@ -1484,3 +1484,49 @@ button.view-button {
 .menu button[aria-checked='true'] {
   color: var(--accent);
 }
+
+/*
+ * Touch screens: toolbar and header buttons are drawn smaller than their 44 px tap area, with less padding
+ * around them, so the schedule gets more room. Menus, tabs, the + button and forms keep full size.
+ */
+@media (pointer: coarse) {
+  .top {
+    min-height: 44px;
+  }
+
+  .toolbar {
+    padding-block: 6px;
+  }
+
+  :is(.top, .toolbar .nav, .toolbar .zoom, .toolbar .segmented, .toolbar .picking) button,
+  .toolbar .add,
+  button.view-button {
+    position: relative;
+    min-height: 36px;
+  }
+
+  /* The part that isn't drawn still takes taps. */
+  :is(.top, .toolbar .nav, .toolbar .zoom, .toolbar .segmented, .toolbar .picking) button::after,
+  .toolbar .add::after,
+  button.view-button::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+  }
+
+  .toolbar .nav button.icon {
+    width: 36px;
+  }
+
+  .segmented button {
+    min-height: 30px;
+  }
+
+  .picking {
+    min-height: 36px;
+  }
+
+  .col-head {
+    padding-block: 3px;
+  }
+}

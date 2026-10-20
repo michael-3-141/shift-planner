@@ -427,6 +427,7 @@ dialog.sheet::backdrop {
 
 .page section {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   padding: 16px;
   border: 1px solid var(--line);
@@ -444,6 +445,7 @@ dialog.sheet::backdrop {
 
 .list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   margin: 0;
   padding: 0;
   list-style: none;

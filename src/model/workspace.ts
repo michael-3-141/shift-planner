@@ -26,7 +26,8 @@ export function defaultRules(): Rules {
   }
 }
 
-export const newId = (): Id => crypto.randomUUID()
+/** 128 random bits as hex. crypto.randomUUID would do, but it only exists on HTTPS pages, and the app also runs over plain HTTP, e.g. on a local network. */
+export const newId = (): Id => Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('')
 
 const PALETTE = ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc948', '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac', '#86bcb6', '#d37295']
 

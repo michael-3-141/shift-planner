@@ -660,7 +660,14 @@ table.totals {
 }
 
 @media (max-width: 899px) {
-  /* Phones: one toolbar row of date, modes and a menu. */
+  /* Phones: one toolbar row of date and view button that never wraps; the date gives way first. */
+  .toolbar {
+    flex-wrap: nowrap;
+  }
+
+  .toolbar .nav button.icon {
+    width: 36px;
+  }
   .toolbar .nav {
     flex: 0 1 auto;
     min-width: 0;
@@ -676,9 +683,6 @@ table.totals {
     text-overflow: ellipsis;
   }
 
-  .segmented.icons button {
-    padding: 0 10px;
-  }
 }
 
 .grid-wrap {
@@ -755,9 +759,6 @@ button.fab {
   background: none;
 }
 
-.menu button[aria-pressed='true'] {
-  color: var(--accent);
-}
 
 /* Phones: a slimmer header (logo, Export, Plan), tabs and draft banner, to leave room for the schedule. */
 @media (max-width: 899px) {
@@ -1457,4 +1458,27 @@ button.switch:disabled {
 
 .export-week .col-head {
   justify-content: center;
+}
+
+/* The view button on phones: the current view's name, opening the views, Today and zoom. */
+button.view-button {
+  flex: none;
+  gap: 6px;
+  padding: 0 10px 0 12px;
+  font-weight: 600;
+}
+
+.menu hr {
+  margin: 4px 6px;
+  border: none;
+  border-top: 1px solid var(--line-soft);
+}
+
+.menu button span {
+  flex: 1;
+  text-align: start;
+}
+
+.menu button[aria-checked='true'] {
+  color: var(--accent);
 }

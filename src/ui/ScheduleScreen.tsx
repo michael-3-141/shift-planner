@@ -175,21 +175,21 @@ export function ScheduleScreen({ workspace, update, now, wide, shifts, draftIds,
               <button className="icon" aria-label={t().schedule.nextDay} disabled={!canGo(1)} onClick={() => go(1)}><Icon name="right" /></button>
             </div>
             <span className="spacer" />
-            <div className="segmented icons" role="tablist" aria-label={t().schedule.show}>
-              {MODES.map(m => (
-                <button key={m} role="tab" aria-selected={mode === m} aria-label={t().schedule.modes[m]} title={t().schedule.modes[m]} onClick={() => setMode(m)}>
-                  <Icon name={MODE_ICONS[m]} />
-                </button>
-              ))}
-            </div>
-            {!missing && (
-              <MoreMenu items={[
-                { label: t().schedule.today, icon: 'calendar', onSelect: () => setDay(() => now) },
-                { label: t().schedule.zoomIn, icon: 'plus', disabled: hourPx >= MAX_HOUR_PX, keepOpen: true, onSelect: () => zoomBy(1.25) },
-                { label: t().schedule.zoomOut, icon: 'minus', disabled: hourPx <= MIN_HOUR_PX, keepOpen: true, onSelect: () => zoomBy(1 / 1.25) },
-                { label: t().schedule.fitTitle, icon: 'fit', pressed: zoom === 'fit', onSelect: fit },
-              ]} />
-            )}
+            {/* One button names the current view and opens the views, Today and zoom. */}
+            <ViewMenu
+              icon={MODE_ICONS[mode]}
+              label={t().schedule.modes[mode]}
+              items={[
+                ...MODES.map(m => ({ label: t().schedule.modes[m], icon: MODE_ICONS[m], checked: mode === m, onSelect: () => setMode(m) })),
+                'separator' as const,
+                { label: t().schedule.today, icon: 'calendar' as const, onSelect: () => setDay(() => now) },
+                ...(missing ? [] : [
+                  { label: t().schedule.zoomIn, icon: 'plus' as const, disabled: hourPx >= MAX_HOUR_PX, keepOpen: true, onSelect: () => zoomBy(1.25) },
+                  { label: t().schedule.zoomOut, icon: 'minus' as const, disabled: hourPx <= MIN_HOUR_PX, keepOpen: true, onSelect: () => zoomBy(1 / 1.25) },
+                  { label: t().schedule.fitTitle, icon: 'fit' as const, checked: zoom === 'fit', onSelect: fit },
+                ]),
+              ]}
+            />
           </>
         )}
       </div>
@@ -235,15 +235,15 @@ interface MenuItem {
   label: string
   icon: IconName
   disabled?: boolean
-  /** Shown as switched on. */
-  pressed?: boolean
+  /** Marked as the current choice, or as switched on. */
+  checked?: boolean
   /** Stay open after choosing, for steps such as zooming in again. */
   keepOpen?: boolean
   onSelect: () => void
 }
 
-/** A ⋯ button with a small menu below it, closed by choosing or by pressing elsewhere. */
-function MoreMenu({ items }: { items: MenuItem[] }) {
+/** A button naming the current view, with a menu below it closed by choosing or by pressing elsewhere. */
+function ViewMenu({ icon, label, items }: { icon: IconName; label: string; items: (MenuItem | 'separator')[] }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -254,12 +254,17 @@ function MoreMenu({ items }: { items: MenuItem[] }) {
   }, [open])
   return (
     <div className="menu-wrap" ref={ref}>
-      <button className="icon" aria-label={t().schedule.more} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(o => !o)}><Icon name="more" /></button>
+      <button className="view-button" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(o => !o)}>
+        <Icon name={icon} size={16} /><span>{label}</span><Icon name="down" size={14} />
+      </button>
       {open && (
         <div className="menu" role="menu">
-          {items.map(item => (
-            <button key={item.label} role="menuitem" disabled={item.disabled} aria-pressed={item.pressed} onClick={() => { item.onSelect(); if (!item.keepOpen) setOpen(false) }}>
-              <Icon name={item.icon} size={16} />{item.label}
+          {items.map((item, i) => item === 'separator' ? <hr key={i} /> : (
+            <button
+              key={item.label} role={item.checked === undefined ? 'menuitem' : 'menuitemcheckbox'} aria-checked={item.checked} disabled={item.disabled}
+              onClick={() => { item.onSelect(); if (!item.keepOpen) setOpen(false) }}
+            >
+              <Icon name={item.icon} size={16} /><span>{item.label}</span>{item.checked && <Icon name="check" size={16} />}
             </button>
           ))}
         </div>

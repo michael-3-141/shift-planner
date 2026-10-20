@@ -63,7 +63,6 @@ export const he: Messages = {
     noPositions: 'יש להוסיף עמדות כדי לראות את הלוח.',
     pickStart: time => `מ־${time} · יש להקיש היכן זה מסתיים`,
     goToday: 'מעבר להיום',
-    more: 'עוד',
   },
   forms: {
     enterRange: 'יש להזין התחלה וסיום.',

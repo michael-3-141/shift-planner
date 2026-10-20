@@ -60,7 +60,6 @@ export const en = {
     noPositions: 'Add positions to see the schedule.',
     pickStart: (time: string) => `From ${time} · tap where it ends`,
     goToday: 'Go to today',
-    more: 'More',
   },
   forms: {
     enterRange: 'Enter a start and an end.',

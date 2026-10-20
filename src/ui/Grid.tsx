@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type TouchEvent } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type TouchEvent } from 'react'
 import { isRtl } from '../i18n/locale'
 import { addDays, formatDay, formatHour, formatTime, HOUR, hoursIntoDay, MINUTE } from '../model/time'
 
@@ -81,7 +81,7 @@ export function Grid({ days, columns, blocks, stepMinutes, hourPx, now, onRange,
     return () => observer.disconnect()
   }, [onViewportHeight])
 
-  const slotAt = (e: PointerEvent<HTMLDivElement>, day: number) => {
+  const slotAt = (e: MouseEvent<HTMLDivElement>, day: number) => {
     const y = e.clientY - e.currentTarget.getBoundingClientRect().top
     // Count slots on the wall clock, so days with a daylight-saving change still match the hour labels.
     const t = new Date(day)
@@ -94,7 +94,10 @@ export function Grid({ days, columns, blocks, stepMinutes, hourPx, now, onRange,
     onRange?.(p.columnId, Math.min(p.start, p.end), Math.max(p.start, p.end) + step)
   }
 
+  // A mouse drag that just ended picks its range on release; the click that follows it isn't a tap.
+  const dragged = useRef(false)
   const down = (e: PointerEvent<HTMLDivElement>, day: number, columnId: string) => {
+    dragged.current = false
     if (!onRange || e.pointerType !== 'mouse' || e.button !== 0) return
     const t = slotAt(e, day)
     drag.current = { pick: { scope, day, columnId, start: t, end: t, dragging: true }, moved: false }
@@ -108,12 +111,23 @@ export function Grid({ days, columns, blocks, stepMinutes, hourPx, now, onRange,
     d.moved = true
     setPick(d.pick)
   }
-  const up = (e: PointerEvent<HTMLDivElement>, day: number, columnId: string) => {
+  const up = () => {
     const d = drag.current
     drag.current = undefined
-    if (d?.moved) return finish(d.pick)
-    // A tap (or a click without dragging): first tap starts a range, a tap in the same column ends it.
-    if (!onRange || (e.pointerType === 'mouse' && e.button !== 0)) return
+    if (d?.moved) {
+      dragged.current = true
+      finish(d.pick)
+    }
+  }
+  // Taps are handled on click, the last event of a tap. Handling them earlier (on pointerup) opened the
+  // form while the tap was still going, and its click then landed on the form's controls.
+  const tap = (e: MouseEvent<HTMLDivElement>, day: number, columnId: string) => {
+    if (dragged.current) {
+      dragged.current = false
+      return
+    }
+    // The first tap starts a range; a tap in the same column ends it.
+    if (!onRange) return
     const t = slotAt(e, day)
     if (pick && pick.day === day && pick.columnId === columnId) finish({ ...pick, end: t })
     else setPick({ scope, day, columnId, start: t, end: t })
@@ -178,7 +192,8 @@ export function Grid({ days, columns, blocks, stepMinutes, hourPx, now, onRange,
                   className={`col${i === 0 ? ' first' : ''}${onRange ? ' pickable' : ''}`}
                   onPointerDown={e => down(e, day, c.id)}
                   onPointerMove={e => move(e, day, c.id)}
-                  onPointerUp={e => up(e, day, c.id)}
+                  onPointerUp={up}
+                  onClick={e => tap(e, day, c.id)}
                 >
                   {now > day && <div className="past" style={{ height: height(day, now) }} />}
                   {mine.map(b => (
@@ -188,8 +203,7 @@ export function Grid({ days, columns, blocks, stepMinutes, hourPx, now, onRange,
                       // Cards sit 1px apart so back-to-back shifts read as separate; coverage fills its slots.
                       style={{ top: top(b.start) + gap(b), height: height(b.start, b.end) - 2 * gap(b), '--color': b.color } as CSSProperties}
                       onPointerDown={b.onSelect ? e => e.stopPropagation() : undefined}
-                      onPointerUp={b.onSelect ? e => e.stopPropagation() : undefined}
-                      onClick={b.onSelect}
+                      onClick={b.onSelect ? e => { e.stopPropagation(); b.onSelect!() } : undefined}
                       role={b.onSelect ? 'button' : undefined}
                       tabIndex={b.onSelect ? 0 : undefined}
                       onKeyDown={b.onSelect ? e => (e.key === 'Enter' || e.key === ' ') && b.onSelect!() : undefined}
